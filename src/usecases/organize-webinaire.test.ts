@@ -17,7 +17,11 @@ describe('Feature: organizing a webinaire', () => {
     });
   }
 
-  const johnDoe = new User({ id: 'john-doe' });
+  const johnDoe = new User({
+    id: 'john-doe',
+    emailAddress: 'johndoe@gmail.com',
+    password: 'azerty',
+  });
 
   let repository: InMemoryWebinaireRepository;
   let idGenerator: FixedIDGenerator;
