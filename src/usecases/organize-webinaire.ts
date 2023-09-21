@@ -1,3 +1,4 @@
+import { User } from '../entities/user.entity';
 import { Webinaire } from '../entities/webinaire.entity';
 import { IDateGenerator } from '../ports/date-generator.interface';
 import { IIDGenerator } from '../ports/id-generator.interface';
@@ -11,6 +12,7 @@ export class OrganizeWebinaire {
   ) {}
 
   async execute(data: {
+    user: User;
     title: string;
     seats: number;
     startDate: Date;
@@ -19,6 +21,7 @@ export class OrganizeWebinaire {
     const id = this.idGenerator.generate();
     const webinaire = new Webinaire({
       id,
+      organizerId: data.user.props.id,
       title: data.title,
       seats: data.seats,
       startDate: data.startDate,

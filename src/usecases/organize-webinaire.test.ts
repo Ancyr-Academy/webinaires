@@ -1,6 +1,7 @@
 import { FixedDateGenerator } from '../adapters/fixed-date-generator';
 import { FixedIDGenerator } from '../adapters/fixed-id-generator';
 import { InMemoryWebinaireRepository } from '../adapters/in-memory-webinaire-repository';
+import { User } from '../entities/user.entity';
 import { Webinaire } from '../entities/webinaire.entity';
 import { OrganizeWebinaire } from './organize-webinaire';
 
@@ -8,12 +9,15 @@ describe('Feature: organizing a webinaire', () => {
   function expectWebinaireToEqual(webinaire: Webinaire) {
     expect(webinaire.props).toEqual({
       id: 'id-1',
+      organizerId: 'john-doe',
       title: 'My first webinaire',
       seats: 100,
       startDate: new Date('2023-01-10T10:00:00.000Z'),
       endDate: new Date('2023-01-10T11:00:00.000Z'),
     });
   }
+
+  const johnDoe = new User({ id: 'john-doe' });
 
   let repository: InMemoryWebinaireRepository;
   let idGenerator: FixedIDGenerator;
@@ -29,6 +33,7 @@ describe('Feature: organizing a webinaire', () => {
 
   describe('Scenario: happy path', () => {
     const payload = {
+      user: johnDoe,
       title: 'My first webinaire',
       seats: 100,
       startDate: new Date('2023-01-10T10:00:00.000Z'),
@@ -53,6 +58,7 @@ describe('Feature: organizing a webinaire', () => {
 
   describe('Scenario: the webinaire happens too soon', () => {
     const payload = {
+      user: johnDoe,
       title: 'My first webinaire',
       seats: 100,
       startDate: new Date('2023-01-03T23:59:59.000Z'),
@@ -76,6 +82,7 @@ describe('Feature: organizing a webinaire', () => {
 
   describe('Scenario: the webinaire has too many seats', () => {
     const payload = {
+      user: johnDoe,
       title: 'My first webinaire',
       seats: 1001,
       startDate: new Date('2023-01-10T10:00:00.000Z'),
@@ -99,6 +106,7 @@ describe('Feature: organizing a webinaire', () => {
 
   describe('Scenario: the webinaire does not have enough seats', () => {
     const payload = {
+      user: johnDoe,
       title: 'My first webinaire',
       seats: 0,
       startDate: new Date('2023-01-10T10:00:00.000Z'),
