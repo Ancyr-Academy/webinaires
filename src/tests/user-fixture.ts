@@ -1,6 +1,8 @@
-import { InMemoryUserRepository } from '../adapters/in-memory-user-repository';
 import { User } from '../entities/user.entity';
-import { IUserRepository } from '../ports/user-repository.interface';
+import {
+  IUserRepository,
+  I_USER_REPOSITORY,
+} from '../ports/user-repository.interface';
 import { IFixture } from './fixture';
 import { TestApp } from './test-app';
 
@@ -8,7 +10,7 @@ export class UserFixture implements IFixture {
   constructor(public entity: User) {}
 
   async load(app: TestApp): Promise<void> {
-    const userRepository = app.get<IUserRepository>(InMemoryUserRepository);
+    const userRepository = app.get<IUserRepository>(I_USER_REPOSITORY);
     await userRepository.create(this.entity);
   }
 

@@ -1,6 +1,9 @@
 import { addDays } from 'date-fns';
 import * as request from 'supertest';
-import { InMemoryWebinaireRepository } from '../adapters/in-memory-webinaire-repository';
+import {
+  IWebinaireRepository,
+  I_WEBINAIRE_REPOSITORY,
+} from '../ports/webinaire-repository.interface';
 import { TestApp } from './test-app';
 import { e2eUsers } from './user-seeds';
 
@@ -35,13 +38,13 @@ describe('Feature: organizing a webinaire', () => {
       expect(result.status).toBe(201);
       expect(result.body).toEqual({ id: expect.any(String) });
 
-      const webinaireRepository = app.get<InMemoryWebinaireRepository>(
-        InMemoryWebinaireRepository,
+      const webinaireRepository = app.get<IWebinaireRepository>(
+        I_WEBINAIRE_REPOSITORY,
       );
-      const webinaire = webinaireRepository.database[0];
+      const webinaire = await webinaireRepository.findById(result.body.id);
 
       expect(webinaire).toBeDefined();
-      expect(webinaire.props).toEqual({
+      expect(webinaire!.props).toEqual({
         id: result.body.id,
         organizerId: 'john-doe',
         title: 'My first webinaire',
