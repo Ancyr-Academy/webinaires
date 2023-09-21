@@ -97,7 +97,7 @@ describe('Feature: organizing a webinaire', () => {
     });
   });
 
-  describe('Scenario: the webinaire dont have enough seats', () => {
+  describe('Scenario: the webinaire does not have enough seats', () => {
     const payload = {
       title: 'My first webinaire',
       seats: 0,
