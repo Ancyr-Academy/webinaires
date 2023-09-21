@@ -3,9 +3,9 @@ import * as request from 'supertest';
 import {
   IWebinaireRepository,
   I_WEBINAIRE_REPOSITORY,
-} from '../ports/webinaire-repository.interface';
-import { TestApp } from './test-app';
-import { e2eUsers } from './user-seeds';
+} from '../webinaires/ports/webinaire-repository.interface';
+import { TestApp } from './utils/test-app';
+import { e2eUsers } from './seeds/user-seeds';
 
 describe('Feature: organizing a webinaire', () => {
   let app: TestApp;

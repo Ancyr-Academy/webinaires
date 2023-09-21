@@ -1,7 +1,7 @@
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { Webinaire } from '../entities/webinaire.entity';
-import { IDateGenerator } from '../ports/date-generator.interface';
-import { IIDGenerator } from '../ports/id-generator.interface';
+import { IDateGenerator } from '../../core/ports/date-generator.interface';
+import { IIDGenerator } from '../../core/ports/id-generator.interface';
 import { IWebinaireRepository } from '../ports/webinaire-repository.interface';
 
 export class OrganizeWebinaire {
