@@ -1,3 +1,4 @@
+import { Executable } from '../../shared/executable';
 import { User } from '../../users/entities/user.entity';
 import { IWebinaireRepository } from '../ports/webinaire-repository.interface';
 
@@ -9,7 +10,7 @@ type Request = {
 
 type Response = void;
 
-export class ChangeSeats {
+export class ChangeSeats implements Executable<Request, Response> {
   constructor(private readonly webinaireRepository: IWebinaireRepository) {}
 
   async execute({ user, webinaireId, seats }: Request): Promise<Response> {

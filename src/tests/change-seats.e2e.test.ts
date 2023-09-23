@@ -5,7 +5,7 @@ import {
   I_WEBINAIRE_REPOSITORY,
 } from '../webinaires/ports/webinaire-repository.interface';
 import { WebinaireFixture } from './fixtures/webinaire-fixture';
-import { e2eUsers } from './seeds/user-seeds';
+import { e2eUsers } from './seeds/user-seeds.e2e';
 import { TestApp } from './utils/test-app';
 
 describe('Feature: changing the number of seats', () => {
