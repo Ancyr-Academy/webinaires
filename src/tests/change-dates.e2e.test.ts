@@ -1,3 +1,4 @@
+import { addDays } from 'date-fns';
 import * as request from 'supertest';
 import { Webinaire } from '../webinaires/entities/webinaire.entity';
 import {
@@ -8,7 +9,7 @@ import { WebinaireFixture } from './fixtures/webinaire-fixture';
 import { e2eUsers } from './seeds/user-seeds.e2e';
 import { TestApp } from './utils/test-app';
 
-describe('Feature: changing the number of seats', () => {
+describe('Feature: changing the number of dates', () => {
   let app: TestApp;
 
   beforeEach(async () => {
@@ -22,8 +23,8 @@ describe('Feature: changing the number of seats', () => {
           organizerId: e2eUsers.johnDoe.entity.props.id,
           seats: 50,
           title: 'My first webinaire',
-          startDate: new Date('2023-01-10T10:00:00.000Z'),
-          endDate: new Date('2023-01-10T11:00:00.000Z'),
+          startDate: addDays(new Date(), 4),
+          endDate: addDays(new Date(), 5),
         }),
       ),
     ]);
@@ -35,14 +36,16 @@ describe('Feature: changing the number of seats', () => {
 
   describe('Scenario: happy path', () => {
     it('should succeed', async () => {
-      const seats = 100;
+      const startDate = addDays(new Date(), 5);
+      const endDate = addDays(new Date(), 6);
       const id = 'id-1';
 
       const result = await request(app.getHttpServer())
-        .post(`/webinaires/${id}/seats`)
+        .post(`/webinaires/${id}/dates`)
         .set('Authorization', e2eUsers.johnDoe.createAuthorizationToken())
         .send({
-          seats,
+          startDate,
+          endDate,
         });
 
       expect(result.status).toBe(200);
@@ -53,19 +56,22 @@ describe('Feature: changing the number of seats', () => {
       const webinaire = await webinaireRepository.findById(id);
 
       expect(webinaire).toBeDefined();
-      expect(webinaire!.props.seats).toEqual(seats);
+      expect(webinaire!.props.startDate).toEqual(startDate);
+      expect(webinaire!.props.endDate).toEqual(endDate);
     });
   });
 
   describe('Scenario: the user is not authenticated', () => {
     it('should reject', async () => {
-      const seats = 100;
+      const startDate = addDays(new Date(), 5);
+      const endDate = addDays(new Date(), 6);
       const id = 'id-1';
 
       const result = await request(app.getHttpServer())
-        .post(`/webinaires/${id}/seats`)
+        .post(`/webinaires/${id}/dates`)
         .send({
-          seats,
+          startDate,
+          endDate,
         });
 
       expect(result.status).toBe(403);
