@@ -14,4 +14,13 @@ export namespace WebinaireAPI {
       id: string;
     };
   }
+
+  export namespace ChangeSeats {
+    export const schema = z.object({
+      seats: z.number(),
+    });
+
+    export type Request = z.infer<typeof schema>;
+    export type Response = void;
+  }
 }
