@@ -4,6 +4,9 @@ import { Executable } from '../../shared/executable';
 import { User } from '../../users/entities/user.entity';
 import { IUserRepository } from '../../users/ports/user-repository.interface';
 import { Webinaire } from '../entities/webinaire.entity';
+import { WebinaireNotFoundException } from '../exceptions/webinaire-not-found';
+import { WebinaireTooEarlyException } from '../exceptions/webinaire-too-early';
+import { WebinaireUpdateForbiddenException } from '../exceptions/webinaire-update-forbidden';
 import { IParticipationRepository } from '../ports/participation-repository.interface';
 import { IWebinaireRepository } from '../ports/webinaire-repository.interface';
 
@@ -25,33 +28,36 @@ export class ChangeDates implements Executable<Request, Response> {
     private readonly usersRepository: IUserRepository,
   ) {}
 
-  async execute(request: Request): Promise<Response> {
-    const webinaire = await this.webinaireRepository.findById(
-      request.webinaireId,
-    );
+  async execute({
+    user,
+    webinaireId,
+    startDate,
+    endDate,
+  }: Request): Promise<Response> {
+    const webinaire = await this.webinaireRepository.findById(webinaireId);
 
     if (webinaire === null) {
-      throw new Error('Webinaire not found');
+      throw new WebinaireNotFoundException();
     }
 
-    if (webinaire.props.organizerId !== request.user.props.id) {
-      throw new Error('You are not allowed to update this webinaire');
+    if (webinaire.isOrganizer(user) === false) {
+      throw new WebinaireUpdateForbiddenException();
     }
 
     webinaire.update({
-      startDate: request.startDate,
-      endDate: request.endDate,
+      startDate,
+      endDate,
     });
 
     if (webinaire.isTooClose(this.dateGenerator.now())) {
-      throw new Error('The webinaire must happen in at least 3 days');
+      throw new WebinaireTooEarlyException();
     }
 
     await this.webinaireRepository.update(webinaire);
     await this.sendEmailToParticipants(webinaire);
   }
 
-  async sendEmailToParticipants(webinaire: Webinaire): Promise<void> {
+  private async sendEmailToParticipants(webinaire: Webinaire): Promise<void> {
     const participations = await this.participationRepository.findByWebinaireId(
       webinaire.props.id,
     );

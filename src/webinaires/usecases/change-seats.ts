@@ -1,5 +1,9 @@
+import { DomainException } from '../../shared/exception';
 import { Executable } from '../../shared/executable';
 import { User } from '../../users/entities/user.entity';
+import { WebinaireNotFoundException } from '../exceptions/webinaire-not-found';
+import { WebinaireTooManySeatsException } from '../exceptions/webinaire-too-many-seats';
+import { WebinaireUpdateForbiddenException } from '../exceptions/webinaire-update-forbidden';
 import { IWebinaireRepository } from '../ports/webinaire-repository.interface';
 
 type Request = {
@@ -17,21 +21,21 @@ export class ChangeSeats implements Executable<Request, Response> {
     const webinaire = await this.webinaireRepository.findById(webinaireId);
 
     if (!webinaire) {
-      throw new Error('Webinaire not found');
+      throw new WebinaireNotFoundException();
     }
 
-    if (webinaire.props.organizerId !== user.props.id) {
-      throw new Error('You are not allowed to update this webinaire');
+    if (webinaire.isOrganizer(user) === false) {
+      throw new WebinaireUpdateForbiddenException();
     }
 
     if (seats < webinaire.props.seats) {
-      throw new Error('You cannot reduce the number of seats');
+      throw new DomainException('You cannot reduce the number of seats');
     }
 
     webinaire.update({ seats });
 
     if (webinaire.hasTooManySeats()) {
-      throw new Error('The webinaire must have a maximum of 1000 seats');
+      throw new WebinaireTooManySeatsException();
     }
 
     await this.webinaireRepository.update(webinaire);

@@ -3,6 +3,9 @@ import { IIDGenerator } from '../../core/ports/id-generator.interface';
 import { Executable } from '../../shared/executable';
 import { User } from '../../users/entities/user.entity';
 import { Webinaire } from '../entities/webinaire.entity';
+import { WebinaireNotEnoughSeatsException } from '../exceptions/webinaire-not-enough-seats';
+import { WebinaireTooEarlyException } from '../exceptions/webinaire-too-early';
+import { WebinaireTooManySeatsException } from '../exceptions/webinaire-too-many-seats';
 import { IWebinaireRepository } from '../ports/webinaire-repository.interface';
 
 type Request = {
@@ -36,15 +39,15 @@ export class OrganizeWebinaire implements Executable<Request, Response> {
     });
 
     if (webinaire.isTooClose(this.dateGenerator.now())) {
-      throw new Error('The webinaire must happen in at least 3 days');
+      throw new WebinaireTooEarlyException();
     }
 
     if (webinaire.hasTooManySeats()) {
-      throw new Error('The webinaire must have a maximum of 1000 seats');
+      throw new WebinaireTooManySeatsException();
     }
 
     if (webinaire.hasNoSeats()) {
-      throw new Error('The webinaire must at least have 1 seat');
+      throw new WebinaireNotEnoughSeatsException();
     }
 
     await this.repository.create(webinaire);
