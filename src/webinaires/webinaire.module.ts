@@ -11,6 +11,7 @@ import { ParticipationController } from './controllers/participation.controller'
 import { WebinaireController } from './controllers/webinaire.controller';
 import { I_PARTICIPATION_REPOSITORY } from './ports/participation-repository.interface';
 import { I_WEBINAIRE_REPOSITORY } from './ports/webinaire-repository.interface';
+import { CancelSeat } from './usecases/cancel-seat';
 import { CancelWebinaire } from './usecases/cancel-webinaire';
 import { ChangeDates } from './usecases/change-dates';
 import { ChangeSeats } from './usecases/change-seats';
@@ -113,6 +114,28 @@ import { ReserveSeat } from './usecases/reserve-seat';
           mailer,
           webinaireRepository,
           usersRepository,
+        );
+      },
+    },
+    {
+      provide: CancelSeat,
+      inject: [
+        I_WEBINAIRE_REPOSITORY,
+        I_PARTICIPATION_REPOSITORY,
+        I_USER_REPOSITORY,
+        I_MAILER,
+      ],
+      useFactory: (
+        webinaireRepository,
+        participationRepository,
+        usersRepository,
+        mailer,
+      ) => {
+        return new CancelSeat(
+          webinaireRepository,
+          participationRepository,
+          usersRepository,
+          mailer,
         );
       },
     },

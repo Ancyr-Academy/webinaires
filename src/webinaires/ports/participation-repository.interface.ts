@@ -8,4 +8,5 @@ export interface IParticipationRepository {
   findParticipationCount(webinaireId: string): Promise<number>;
 
   create(participation: Participation): Promise<void>;
+  delete(participation: Participation): Promise<void>;
 }

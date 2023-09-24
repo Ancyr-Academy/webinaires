@@ -33,6 +33,16 @@ export class InMemoryParticipationRepository
     this.database.push(participation);
   }
 
+  async delete(participation: Participation): Promise<void> {
+    const index = this.database.findIndex(
+      (p) =>
+        p.props.userId === participation.props.userId &&
+        p.props.webinaireId === participation.props.webinaireId,
+    );
+
+    this.database.splice(index, 1);
+  }
+
   findOneSync(userId: string, webinaireId: string): Participation | null {
     return (
       this.database.find(
