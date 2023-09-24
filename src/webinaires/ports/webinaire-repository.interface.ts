@@ -6,4 +6,5 @@ export interface IWebinaireRepository {
   findById(id: string): Promise<Webinaire | null>;
   create(webinaire: Webinaire): Promise<void>;
   update(webinaire: Webinaire): Promise<void>;
+  delete(webinaire: Webinaire): Promise<void>;
 }

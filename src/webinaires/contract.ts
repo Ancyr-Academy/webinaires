@@ -33,4 +33,8 @@ export namespace WebinaireAPI {
     export type Request = z.infer<typeof schema>;
     export type Response = void;
   }
+
+  export namespace CancelWebinaire {
+    export type Response = void;
+  }
 }

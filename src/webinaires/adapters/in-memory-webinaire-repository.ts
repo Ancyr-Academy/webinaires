@@ -26,4 +26,12 @@ export class InMemoryWebinaireRepository implements IWebinaireRepository {
     this.database[index] = webinaire;
     webinaire.commit();
   }
+
+  async delete(webinaire: Webinaire): Promise<void> {
+    const index = this.database.findIndex(
+      (w) => w.props.id === webinaire.props.id,
+    );
+
+    this.database.splice(index, 1);
+  }
 }
