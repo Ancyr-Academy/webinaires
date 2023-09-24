@@ -7,6 +7,7 @@ import { I_USER_REPOSITORY } from '../users/ports/user-repository.interface';
 import { UserModule } from '../users/user.module';
 import { InMemoryParticipationRepository } from './adapters/in-memory-participation-repository';
 import { InMemoryWebinaireRepository } from './adapters/in-memory-webinaire-repository';
+import { ParticipationController } from './controllers/participation.controller';
 import { WebinaireController } from './controllers/webinaire.controller';
 import { I_PARTICIPATION_REPOSITORY } from './ports/participation-repository.interface';
 import { I_WEBINAIRE_REPOSITORY } from './ports/webinaire-repository.interface';
@@ -14,10 +15,11 @@ import { CancelWebinaire } from './usecases/cancel-webinaire';
 import { ChangeDates } from './usecases/change-dates';
 import { ChangeSeats } from './usecases/change-seats';
 import { OrganizeWebinaire } from './usecases/organize-webinaire';
+import { ReserveSeat } from './usecases/reserve-seat';
 
 @Module({
   imports: [CommonModule, UserModule],
-  controllers: [WebinaireController],
+  controllers: [WebinaireController, ParticipationController],
   providers: [
     {
       provide: I_WEBINAIRE_REPOSITORY,
@@ -88,6 +90,28 @@ import { OrganizeWebinaire } from './usecases/organize-webinaire';
           webinaireRepository,
           mailer,
           participationRepository,
+          usersRepository,
+        );
+      },
+    },
+    {
+      provide: ReserveSeat,
+      inject: [
+        I_PARTICIPATION_REPOSITORY,
+        I_MAILER,
+        I_WEBINAIRE_REPOSITORY,
+        I_USER_REPOSITORY,
+      ],
+      useFactory: (
+        participationRepository,
+        mailer,
+        webinaireRepository,
+        usersRepository,
+      ) => {
+        return new ReserveSeat(
+          participationRepository,
+          mailer,
+          webinaireRepository,
           usersRepository,
         );
       },

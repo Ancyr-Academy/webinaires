@@ -10,8 +10,7 @@ export class InMemoryWebinaireRepository implements IWebinaireRepository {
   }
 
   async findById(id: string): Promise<Webinaire | null> {
-    const webinaire = this.database.find((w) => w.props.id === id);
-    return webinaire ? new Webinaire({ ...webinaire.initialState }) : null;
+    return this.findByIdSync(id);
   }
 
   async create(webinaire: Webinaire): Promise<void> {

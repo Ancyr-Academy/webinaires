@@ -1,11 +1,10 @@
 import * as request from 'supertest';
-import { Webinaire } from '../webinaires/entities/webinaire.entity';
 import {
   IWebinaireRepository,
   I_WEBINAIRE_REPOSITORY,
 } from '../webinaires/ports/webinaire-repository.interface';
-import { WebinaireFixture } from './fixtures/webinaire-fixture';
 import { e2eUsers } from './seeds/user-seeds.e2e';
+import { e2eWebinaires } from './seeds/webinaire-seeds.e2e';
 import { TestApp } from './utils/test-app';
 
 describe('Feature: changing the number of seats', () => {
@@ -14,19 +13,7 @@ describe('Feature: changing the number of seats', () => {
   beforeEach(async () => {
     app = new TestApp();
     await app.setup();
-    await app.loadFixtures([
-      e2eUsers.johnDoe,
-      new WebinaireFixture(
-        new Webinaire({
-          id: 'id-1',
-          organizerId: e2eUsers.johnDoe.entity.props.id,
-          seats: 50,
-          title: 'My first webinaire',
-          startDate: new Date('2023-01-10T10:00:00.000Z'),
-          endDate: new Date('2023-01-10T11:00:00.000Z'),
-        }),
-      ),
-    ]);
+    await app.loadFixtures([e2eUsers.johnDoe, e2eWebinaires.webinaire1]);
   });
 
   afterEach(async () => {
@@ -36,7 +23,7 @@ describe('Feature: changing the number of seats', () => {
   describe('Scenario: happy path', () => {
     it('should succeed', async () => {
       const seats = 100;
-      const id = 'id-1';
+      const id = e2eWebinaires.webinaire1.entity.props.id;
 
       const result = await request(app.getHttpServer())
         .post(`/webinaires/${id}/seats`)
@@ -60,7 +47,7 @@ describe('Feature: changing the number of seats', () => {
   describe('Scenario: the user is not authenticated', () => {
     it('should reject', async () => {
       const seats = 100;
-      const id = 'id-1';
+      const id = e2eWebinaires.webinaire1.entity.props.id;
 
       const result = await request(app.getHttpServer())
         .post(`/webinaires/${id}/seats`)
