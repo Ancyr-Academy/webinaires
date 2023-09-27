@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 
 import { APP_GUARD } from '@nestjs/core';
+import { MongooseModule } from '@nestjs/mongoose';
+
 import { I_USER_REPOSITORY } from '../users/ports/user-repository.interface';
 import { Authenticator } from '../users/services/authenticator';
 import { UserModule } from '../users/user.module';
@@ -11,7 +13,14 @@ import { AuthGuard } from './auth.guard';
 import { CommonModule } from './common.module';
 
 @Module({
-  imports: [WebinaireModule, UserModule, CommonModule],
+  imports: [
+    MongooseModule.forRoot(
+      'mongodb://admin:azerty@localhost:3701/webinaires?authSource=admin&directConnection=true',
+    ),
+    WebinaireModule,
+    UserModule,
+    CommonModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
