@@ -5,6 +5,7 @@ import { Test } from '@nestjs/testing';
 import { Model } from 'mongoose';
 import { AppModule } from '../../core/app.module';
 import { MongoUser } from '../../users/adapters/mongo/mongo-user';
+import { MongoWebinaire } from '../../webinaires/adapters/mongo/mongo-webinaire';
 import { IFixture } from './fixture';
 
 export class TestApp {
@@ -54,6 +55,12 @@ export class TestApp {
     await this.app
       .get<Model<MongoUser.SchemaClass>>(
         getModelToken(MongoUser.CollectionName),
+      )
+      .deleteMany({});
+
+    await this.app
+      .get<Model<MongoWebinaire.SchemaClass>>(
+        getModelToken(MongoWebinaire.CollectionName),
       )
       .deleteMany({});
   }
