@@ -5,7 +5,7 @@ import { InMemoryParticipationRepository } from '../adapters/in-memory-participa
 import { InMemoryWebinaireRepository } from '../adapters/in-memory-webinaire-repository';
 import { Participation } from '../entities/participation.entity';
 import { Webinaire } from '../entities/webinaire.entity';
-import { ReserveSeat } from './reserve-seat';
+import { ReserveSeatCommand, ReserveSeatCommandHandler } from './reserve-seat';
 
 describe('Feature: reserving a seat', () => {
   function expectParticipationNotToBeCreated() {
@@ -53,7 +53,7 @@ describe('Feature: reserving a seat', () => {
   let mailer: InMemoryMailer;
   let webinaireRepository: InMemoryWebinaireRepository;
   let userRepository: InMemoryUserRepository;
-  let useCase: ReserveSeat;
+  let useCase: ReserveSeatCommandHandler;
 
   beforeEach(async () => {
     participationRepository = new InMemoryParticipationRepository([
@@ -70,7 +70,7 @@ describe('Feature: reserving a seat', () => {
       testUsers.charles,
     ]);
 
-    useCase = new ReserveSeat(
+    useCase = new ReserveSeatCommandHandler(
       participationRepository,
       mailer,
       webinaireRepository,
@@ -79,10 +79,7 @@ describe('Feature: reserving a seat', () => {
   });
 
   describe('Scenario: happy path', () => {
-    const payload = {
-      user: testUsers.bob,
-      webinaireId: webinaire.props.id,
-    };
+    const payload = new ReserveSeatCommand(testUsers.bob, webinaire.props.id);
 
     it('should reserve a seat', async () => {
       await useCase.execute(payload);
@@ -112,10 +109,7 @@ describe('Feature: reserving a seat', () => {
   });
 
   describe('Scenario: the webinaire does not exist', () => {
-    const payload = {
-      user: testUsers.bob,
-      webinaireId: 'random-id',
-    };
+    const payload = new ReserveSeatCommand(testUsers.bob, 'random-id');
 
     it('should fail', async () => {
       await expect(() => useCase.execute(payload)).rejects.toThrowError(
@@ -127,10 +121,10 @@ describe('Feature: reserving a seat', () => {
   });
 
   describe('Scenario: the webinaire does not have enough seats', () => {
-    const payload = {
-      user: testUsers.bob,
-      webinaireId: webinaireWithFewSeats.props.id,
-    };
+    const payload = new ReserveSeatCommand(
+      testUsers.bob,
+      webinaireWithFewSeats.props.id,
+    );
 
     it('should fail', async () => {
       await expect(() => useCase.execute(payload)).rejects.toThrowError(
@@ -142,10 +136,10 @@ describe('Feature: reserving a seat', () => {
   });
 
   describe('Scenario: the user already participates in the webinaire', () => {
-    const payload = {
-      user: testUsers.charles,
-      webinaireId: webinaireWithFewSeats.props.id,
-    };
+    const payload = new ReserveSeatCommand(
+      testUsers.charles,
+      webinaireWithFewSeats.props.id,
+    );
 
     it('should fail', async () => {
       await expect(() => useCase.execute(payload)).rejects.toThrowError(

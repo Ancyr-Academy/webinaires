@@ -1,19 +1,24 @@
 import { NotFoundException } from '@nestjs/common';
+import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Model } from 'mongoose';
-import { MongoUser } from '../../../users/adapters/mongo/mongo-user';
-import { WebinaireDTO } from '../../dto/webinaire.dto';
-import { GetWebinaireByIdQuery } from '../../ports/get-webinaire-by-id-query.interface';
-import { MongoParticipation } from './mongo-participation';
-import { MongoWebinaire } from './mongo-webinaire';
+import { MongoUser } from '../../users/adapters/mongo/mongo-user';
+import { MongoParticipation } from '../adapters/mongo/mongo-participation';
+import { MongoWebinaire } from '../adapters/mongo/mongo-webinaire';
+import { WebinaireDTO } from '../dto/webinaire.dto';
 
-export class MongoGetWebinaireById implements GetWebinaireByIdQuery {
+export class GetWebinaireByIdQuery implements IQuery {
+  constructor(public id: string) {}
+}
+
+@QueryHandler(GetWebinaireByIdQuery)
+export class GetWebinaireByIdQueryHandler implements IQueryHandler {
   constructor(
     private readonly webinaireModel: Model<MongoWebinaire.SchemaClass>,
     private readonly participationModel: Model<MongoParticipation.SchemaClass>,
     private readonly userModel: Model<MongoUser.SchemaClass>,
   ) {}
 
-  async execute(id: string): Promise<WebinaireDTO> {
+  async execute({ id }: GetWebinaireByIdQuery): Promise<WebinaireDTO> {
     const webinaire = await this.webinaireModel.findById(id);
     if (!webinaire) {
       throw new NotFoundException();

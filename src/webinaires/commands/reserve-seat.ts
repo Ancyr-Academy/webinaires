@@ -1,5 +1,5 @@
+import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import { IMailer } from '../../core/ports/mailer.interface';
-import { Executable } from '../../shared/executable';
 import { User } from '../../users/entities/user.entity';
 import { IUserRepository } from '../../users/ports/user-repository.interface';
 import { Participation } from '../entities/participation.entity';
@@ -10,14 +10,19 @@ import { WebinaireNotFoundException } from '../exceptions/webinaire-not-found';
 import { IParticipationRepository } from '../ports/participation-repository.interface';
 import { IWebinaireRepository } from '../ports/webinaire-repository.interface';
 
-type Request = {
-  user: User;
-  webinaireId: string;
-};
-
 type Response = void;
 
-export class ReserveSeat implements Executable<Request, Response> {
+export class ReserveSeatCommand implements ICommand {
+  constructor(
+    public user: User,
+    public webinaireId: string,
+  ) {}
+}
+
+@CommandHandler(ReserveSeatCommand)
+export class ReserveSeatCommandHandler
+  implements ICommandHandler<ReserveSeatCommand, Response>
+{
   constructor(
     private readonly participationRepository: IParticipationRepository,
     private readonly mailer: IMailer,
@@ -25,7 +30,7 @@ export class ReserveSeat implements Executable<Request, Response> {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute({ user, webinaireId }: Request): Promise<void> {
+  async execute({ webinaireId, user }: ReserveSeatCommand): Promise<void> {
     const webinaire = await this.webinaireRepository.findById(webinaireId);
 
     if (!webinaire) {

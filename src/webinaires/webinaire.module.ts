@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { CommonModule } from '../core/common.module';
 import { I_DATE_GENERATOR } from '../core/ports/date-generator.interface';
@@ -7,25 +8,25 @@ import { I_MAILER } from '../core/ports/mailer.interface';
 import { MongoUser } from '../users/adapters/mongo/mongo-user';
 import { I_USER_REPOSITORY } from '../users/ports/user-repository.interface';
 import { UserModule } from '../users/user.module';
-import { MongoGetWebinaireById } from './adapters/mongo/mongo-get-webinaire-by-id-query';
 import { MongoParticipation } from './adapters/mongo/mongo-participation';
 import { MongoParticipationRepository } from './adapters/mongo/mongo-participation-repository';
 import { MongoWebinaire } from './adapters/mongo/mongo-webinaire';
 import { MongoWebinaireRepository } from './adapters/mongo/mongo-webinaire-repository';
+import { CancelSeat } from './commands/cancel-seat';
+import { CancelWebinaire } from './commands/cancel-webinaire';
+import { ChangeDates } from './commands/change-dates';
+import { ChangeSeats } from './commands/change-seats';
+import { OrganizeWebinaire } from './commands/organize-webinaire';
+import { ReserveSeatCommandHandler } from './commands/reserve-seat';
 import { ParticipationController } from './controllers/participation.controller';
 import { WebinaireController } from './controllers/webinaire.controller';
-import { I_GET_WEBINAIRE_BY_ID_QUERY } from './ports/get-webinaire-by-id-query.interface';
 import { I_PARTICIPATION_REPOSITORY } from './ports/participation-repository.interface';
 import { I_WEBINAIRE_REPOSITORY } from './ports/webinaire-repository.interface';
-import { CancelSeat } from './usecases/cancel-seat';
-import { CancelWebinaire } from './usecases/cancel-webinaire';
-import { ChangeDates } from './usecases/change-dates';
-import { ChangeSeats } from './usecases/change-seats';
-import { OrganizeWebinaire } from './usecases/organize-webinaire';
-import { ReserveSeat } from './usecases/reserve-seat';
+import { GetWebinaireByIdQueryHandler } from './queries/get-webinaire-by-id';
 
 @Module({
   imports: [
+    CqrsModule,
     CommonModule,
     UserModule,
     MongooseModule.forFeature([
@@ -56,14 +57,14 @@ import { ReserveSeat } from './usecases/reserve-seat';
       },
     },
     {
-      provide: I_GET_WEBINAIRE_BY_ID_QUERY,
+      provide: GetWebinaireByIdQueryHandler,
       inject: [
         getModelToken(MongoWebinaire.CollectionName),
         getModelToken(MongoParticipation.CollectionName),
         getModelToken(MongoUser.CollectionName),
       ],
       useFactory: (webinaireModel, participationModel, userModel) => {
-        return new MongoGetWebinaireById(
+        return new GetWebinaireByIdQueryHandler(
           webinaireModel,
           participationModel,
           userModel,
@@ -132,7 +133,7 @@ import { ReserveSeat } from './usecases/reserve-seat';
       },
     },
     {
-      provide: ReserveSeat,
+      provide: ReserveSeatCommandHandler,
       inject: [
         I_PARTICIPATION_REPOSITORY,
         I_MAILER,
@@ -145,7 +146,7 @@ import { ReserveSeat } from './usecases/reserve-seat';
         webinaireRepository,
         usersRepository,
       ) => {
-        return new ReserveSeat(
+        return new ReserveSeatCommandHandler(
           participationRepository,
           mailer,
           webinaireRepository,

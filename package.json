@@ -21,6 +21,7 @@
     "@nestjs/common": "^10.2.5",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.2.5",
+    "@nestjs/cqrs": "^10.2.6",
     "@nestjs/mongoose": "^10.0.1",
     "@nestjs/platform-express": "^10.2.5",
     "date-fns": "^2.30.0",
