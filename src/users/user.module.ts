@@ -22,6 +22,6 @@ import { I_USER_REPOSITORY } from './ports/user-repository.interface';
       },
     },
   ],
-  exports: [I_USER_REPOSITORY],
+  exports: [MongooseModule, I_USER_REPOSITORY],
 })
 export class UserModule {}
